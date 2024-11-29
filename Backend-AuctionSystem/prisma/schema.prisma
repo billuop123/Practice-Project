@@ -1,0 +1,45 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  name         String
+  photo        String        @default("../../assets/default.png")
+  password     String
+  auctionItems AuctionItems[] // Cascade delete auction items
+  bids         Bids[]         // Cascade delete bids
+}
+
+model AuctionItems {
+  id          Int          @id @default(autoincrement())
+  startingPrice Int
+  name        String
+  description String
+  createdAt   DateTime      @default(now())
+  deadline    DateTime 
+  photo       String
+  userId      Int
+  bids        Bids[]        
+  status      AuctionStatus @default(OPEN)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade) // Cascade delete user
+}
+enum AuctionStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+model Bids {
+  id         Int            @id @default(autoincrement())
+  price      Int
+  userEmail  String
+  auctionId  Int
+  auction    AuctionItems   @relation(fields: [auctionId], references: [id], onDelete: Cascade) // Cascade delete auction
+  user       User           @relation(fields: [userEmail], references: [email], onDelete: Cascade) // Cascade delete user
+}

@@ -1,0 +1,10 @@
+import { login, Signup } from "../Controller/authController";
+import { authMiddleware } from "../Controller/authMiddleware";
+import { cloudinarySetup } from "../Controller/cloudinaryController";
+import { info } from "../Controller/frontendController";
+import express from "express";
+export const userRouter = express();
+const upload = cloudinarySetup();
+userRouter.post("/signup", upload.single("file"), Signup);
+userRouter.post("/login", login);
+userRouter.post("/info", authMiddleware, info);
